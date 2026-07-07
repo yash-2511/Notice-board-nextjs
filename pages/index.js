@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { Geist, Geist_Mono } from "next/font/google";
 
 const geistSans = Geist({
@@ -13,66 +12,105 @@ const geistMono = Geist_Mono({
 
 export default function Home() {
   return (
-    <div
-      className={`${geistSans.className} ${geistMono.className} flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black`}
-    >
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the index.js file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className={`${geistSans.variable} ${geistMono.variable} font-sans`}>
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-zinc-200 dark:border-zinc-800">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Notices</h1>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+            View and manage official announcements and notices.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        <div>
+          <button
+            disabled
+            className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 opacity-50 cursor-not-allowed transition-colors"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs/pages/getting-started?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            Add Notice
+          </button>
         </div>
-      </main>
+      </div>
+
+      {/* Info notice about database foundation */}
+      <div className="my-6 p-4 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          <span className="font-semibold text-zinc-900 dark:text-zinc-100">Project Shell Ready:</span> The base layout and theme toggle are complete. Database connectivity and interactive operations will be implemented in the upcoming phases.
+        </p>
+      </div>
+
+      {/* Mock Notices Grid to demonstrate UI & Themes */}
+      <div className="mt-8">
+        <h2 className="text-lg font-semibold mb-4 text-zinc-700 dark:text-zinc-300">Preview: Responsive Notice Cards</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Card 1 - Urgent Notice */}
+          <div className="relative flex flex-col justify-between p-6 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all">
+            <div>
+              <div className="flex items-center justify-between gap-2 mb-3">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800/50">
+                  Urgent
+                </span>
+                <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                  {new Date().toLocaleDateString()}
+                </span>
+              </div>
+              <h3 className="text-base font-bold text-zinc-950 dark:text-zinc-50">
+                End Semester Exam Schedule
+              </h3>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-2 line-clamp-3">
+                The official timetable for the end semester examinations has been published. Please review your schedules and seating arrangements.
+              </p>
+            </div>
+            
+            <div className="flex items-center justify-between mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800/80">
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200">
+                Exam
+              </span>
+              <div className="flex gap-2">
+                <button disabled className="text-xs font-medium text-zinc-500 dark:text-zinc-400 opacity-50 cursor-not-allowed hover:text-zinc-900 dark:hover:text-white px-2 py-1">
+                  Edit
+                </button>
+                <button disabled className="text-xs font-medium text-red-500 opacity-50 cursor-not-allowed hover:text-red-600 px-2 py-1">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 2 - Normal Notice */}
+          <div className="relative flex flex-col justify-between p-6 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all">
+            <div>
+              <div className="flex items-center justify-between gap-2 mb-3">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/50">
+                  Normal
+                </span>
+                <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                  {new Date().toLocaleDateString()}
+                </span>
+              </div>
+              <h3 className="text-base font-bold text-zinc-950 dark:text-zinc-50">
+                Annual Cultural Festival 2026
+              </h3>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-2 line-clamp-3">
+                Registrations are now open for the annual cultural festival. Students interested in volunteering or performing can sign up at the student center.
+              </p>
+            </div>
+            
+            <div className="flex items-center justify-between mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800/80">
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200">
+                Event
+              </span>
+              <div className="flex gap-2">
+                <button disabled className="text-xs font-medium text-zinc-500 dark:text-zinc-400 opacity-50 cursor-not-allowed hover:text-zinc-900 dark:hover:text-white px-2 py-1">
+                  Edit
+                </button>
+                <button disabled className="text-xs font-medium text-red-500 opacity-50 cursor-not-allowed hover:text-red-600 px-2 py-1">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
