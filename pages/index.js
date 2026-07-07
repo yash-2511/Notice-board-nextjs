@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import prisma from "@/lib/prisma";
+import NoticeForm from "@/components/NoticeForm";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,6 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export default function Home({ notices, error }) {
+  const [showForm, setShowForm] = useState(false);
+
   return (
     <div className={`${geistSans.variable} ${geistMono.variable} font-sans`}>
       {/* Page Header */}
@@ -24,13 +28,42 @@ export default function Home({ notices, error }) {
         </div>
         <div>
           <button
-            disabled
-            className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 opacity-50 cursor-not-allowed transition-colors"
+            onClick={() => setShowForm(true)}
+            className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-zinc-100"
           >
             Add Notice
           </button>
         </div>
       </div>
+
+      {/* Reusable Form Modal */}
+      {showForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/40 backdrop-blur-sm dark:bg-black/60">
+          <div className="relative w-full max-w-2xl bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xl p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-zinc-100 dark:border-zinc-800/80">
+              <h2 className="text-lg font-bold text-zinc-950 dark:text-zinc-50">Create New Notice</h2>
+              <button
+                onClick={() => setShowForm(false)}
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
+                aria-label="Close form modal"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <NoticeForm
+              onCancel={() => setShowForm(false)}
+              onSubmit={(data) => {
+                console.log("Form submit logic skipped in Phase 5 foundation:", data);
+                setShowForm(false);
+              }}
+              submitLabel="Create Notice"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Error State Banner */}
       {error && (
