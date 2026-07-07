@@ -1,0 +1,21 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Notice {
+  id          Int      @id @default(autoincrement())
+  title       String
+  body        String   @db.Text
+  category    String   // Allowed values: Exam, Event, General
+  priority    String   // Allowed values: Normal, Urgent
+  publishDate DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
