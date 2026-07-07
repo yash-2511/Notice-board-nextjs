@@ -17,28 +17,36 @@ const geistMono = Geist_Mono({
 export default function Home({ notices, error }) {
   const router = useRouter();
   const [showForm, setShowForm] = useState(false);
+  const [editingNotice, setEditingNotice] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
-  const handleCreateNotice = async (formData) => {
+  const handleFormSubmit = async (formData) => {
     setFormLoading(true);
     setSubmitError(null);
+    
+    const isEditing = !!editingNotice;
+    const url = "/api/notices";
+    const method = isEditing ? "PUT" : "POST";
+    const bodyData = isEditing ? { id: editingNotice.id, ...formData } : formData;
+
     try {
-      const response = await fetch("/api/notices", {
-        method: "POST",
+      const response = await fetch(url, {
+        method: method,
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(bodyData),
       });
 
       if (!response.ok) {
         const errData = await response.json();
-        throw new Error(errData.error || "Failed to create notice.");
+        throw new Error(errData.error || `Failed to ${isEditing ? "update" : "create"} notice.`);
       }
 
       // Success: close form and refresh page data
       setShowForm(false);
+      setEditingNotice(null);
       router.replace(router.asPath);
     } catch (err) {
       setSubmitError(err.message);
@@ -48,8 +56,20 @@ export default function Home({ notices, error }) {
   };
 
   const handleOpenCreateForm = () => {
+    setEditingNotice(null);
     setSubmitError(null);
     setShowForm(true);
+  };
+
+  const handleOpenEditForm = (notice) => {
+    setSubmitError(null);
+    setEditingNotice(notice);
+    setShowForm(true);
+  };
+
+  const handleCloseForm = () => {
+    setShowForm(false);
+    setEditingNotice(null);
   };
 
   return (
@@ -77,9 +97,11 @@ export default function Home({ notices, error }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/40 backdrop-blur-sm dark:bg-black/60">
           <div className="relative w-full max-w-2xl bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xl p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-zinc-100 dark:border-zinc-800/80">
-              <h2 className="text-lg font-bold text-zinc-950 dark:text-zinc-50">Create New Notice</h2>
+              <h2 className="text-lg font-bold text-zinc-950 dark:text-zinc-50">
+                {editingNotice ? "Edit Notice" : "Create New Notice"}
+              </h2>
               <button
-                onClick={() => setShowForm(false)}
+                onClick={handleCloseForm}
                 className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
                 aria-label="Close form modal"
               >
@@ -96,9 +118,10 @@ export default function Home({ notices, error }) {
             )}
 
             <NoticeForm
-              onCancel={() => setShowForm(false)}
-              onSubmit={handleCreateNotice}
-              submitLabel="Create Notice"
+              initialData={editingNotice || {}}
+              onCancel={handleCloseForm}
+              onSubmit={handleFormSubmit}
+              submitLabel={editingNotice ? "Update Notice" : "Create Notice"}
               isLoading={formLoading}
             />
           </div>
@@ -131,7 +154,7 @@ export default function Home({ notices, error }) {
                   d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-.586-1.414l-4.5-4.5A2 2 0 0013.086 3H10"
                 />
               </svg>
-              <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">No notices found</h3>
+              <h3 className="text-base font-semibold text-zinc-950 dark:text-zinc-50">No notices found</h3>
               <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 max-w-xs mx-auto">
                 There are currently no announcements. Check back later for updates.
               </p>
@@ -177,8 +200,8 @@ export default function Home({ notices, error }) {
                     </span>
                     <div className="flex gap-2">
                       <button
-                        disabled
-                        className="text-xs font-medium text-zinc-500 dark:text-zinc-400 opacity-50 cursor-not-allowed hover:text-zinc-900 dark:hover:text-white px-2 py-1"
+                        onClick={() => handleOpenEditForm(notice)}
+                        className="text-xs font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white px-2 py-1 transition-colors"
                       >
                         Edit
                       </button>
