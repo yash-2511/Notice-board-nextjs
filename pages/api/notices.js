@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 export default async function handler(req, res) {
   if (req.method === "POST") {
     try {
-      const { title, body, category, priority, publishDate } = req.body;
+      const { title, body, category, priority, publishDate, image } = req.body;
 
       // 1. Required fields checks
       if (!title || typeof title !== "string" || !title.trim()) {
@@ -30,7 +30,12 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "Publish date must be a valid date format." });
       }
 
-      // 4. Persistence
+      // 4. Image type restriction (must be string if present)
+      if (image && typeof image !== "string") {
+        return res.status(400).json({ error: "Image must be a valid string format." });
+      }
+
+      // 5. Persistence
       const newNotice = await prisma.notice.create({
         data: {
           title: title.trim(),
@@ -38,6 +43,7 @@ export default async function handler(req, res) {
           category,
           priority,
           publishDate: parsedDate,
+          image: image ? image.trim() : null,
         },
       });
 
@@ -48,7 +54,7 @@ export default async function handler(req, res) {
     }
   } else if (req.method === "PUT") {
     try {
-      const { id, title, body, category, priority, publishDate } = req.body;
+      const { id, title, body, category, priority, publishDate, image } = req.body;
 
       if (!id) {
         return res.status(400).json({ error: "Notice ID is required for updates." });
@@ -92,7 +98,12 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "Publish date must be a valid date format." });
       }
 
-      // 4. Update persistence
+      // 4. Image type restriction (must be string if present)
+      if (image && typeof image !== "string") {
+        return res.status(400).json({ error: "Image must be a valid string format." });
+      }
+
+      // 5. Update persistence
       const updatedNotice = await prisma.notice.update({
         where: { id: noticeId },
         data: {
@@ -101,6 +112,7 @@ export default async function handler(req, res) {
           category,
           priority,
           publishDate: parsedDate,
+          image: image ? image.trim() : null,
         },
       });
 

@@ -266,6 +266,16 @@ export default function Home({ notices, error }) {
                     <h3 className="text-base font-bold text-zinc-950 dark:text-zinc-50 leading-snug">
                       {notice.title}
                     </h3>
+                    {notice.image && (
+                      <div className="relative w-full h-48 mt-3 rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden bg-zinc-100 dark:bg-zinc-950">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={notice.image}
+                          alt="Notice Attachment"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
                     <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-2 whitespace-pre-wrap">
                       {notice.body}
                     </p>

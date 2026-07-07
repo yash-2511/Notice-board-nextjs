@@ -12,6 +12,7 @@ export default function NoticeForm({
   const [category, setCategory] = useState(initialData.category || "General");
   const [priority, setPriority] = useState(initialData.priority || "Normal");
   const [publishDate, setPublishDate] = useState("");
+  const [image, setImage] = useState(initialData.image || "");
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -24,6 +25,21 @@ export default function NoticeForm({
       setPublishDate(new Date().toISOString().split("T")[0]);
     }
   }, [initialData.publishDate]);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImage(reader.result); // Save base64 string
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = () => {
+    setImage("");
+  };
 
   const validate = () => {
     const newErrors = {};
@@ -41,8 +57,6 @@ export default function NoticeForm({
         newErrors.publishDate = "Please enter a valid date";
       }
     }
-    
-    // Validate select values
     if (!["Exam", "Event", "General"].includes(category)) {
       newErrors.category = "Invalid category choice";
     }
@@ -64,11 +78,12 @@ export default function NoticeForm({
       category,
       priority,
       publishDate: new Date(publishDate).toISOString(),
+      image: image || null,
     });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto pr-1">
       {/* Title Field */}
       <div>
         <label
@@ -102,7 +117,7 @@ export default function NoticeForm({
         </label>
         <textarea
           id="notice-body"
-          rows="5"
+          rows="4"
           value={body}
           onChange={(e) => setBody(e.target.value)}
           placeholder="Enter the notice description and details here..."
@@ -134,9 +149,6 @@ export default function NoticeForm({
             <option value="Exam">Exam</option>
             <option value="Event">Event</option>
           </select>
-          {errors.category && (
-            <p className="mt-1.5 text-xs text-red-600 dark:text-red-400">{errors.category}</p>
-          )}
         </div>
 
         {/* Priority Field */}
@@ -156,9 +168,6 @@ export default function NoticeForm({
             <option value="Normal">Normal</option>
             <option value="Urgent">Urgent</option>
           </select>
-          {errors.priority && (
-            <p className="mt-1.5 text-xs text-red-600 dark:text-red-400">{errors.priority}</p>
-          )}
         </div>
 
         {/* Publish Date Field */}
@@ -180,6 +189,53 @@ export default function NoticeForm({
           />
           {errors.publishDate && (
             <p className="mt-1.5 text-xs text-red-600 dark:text-red-400">{errors.publishDate}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Image Upload Field */}
+      <div>
+        <label
+          htmlFor="notice-image"
+          className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5"
+        >
+          Attachment Image <span className="text-xs text-zinc-400 font-normal">(Optional)</span>
+        </label>
+        
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <label
+            htmlFor="notice-image"
+            className="cursor-pointer inline-flex items-center px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-950 transition-colors"
+          >
+            Choose Image File
+            <input
+              id="notice-image"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="sr-only"
+            />
+          </label>
+          
+          {image && (
+            <div className="flex items-center gap-3">
+              {/* Image Preview thumbnail */}
+              <div className="relative w-12 h-12 rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden bg-zinc-100 dark:bg-zinc-900">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={image}
+                  alt="Attachment Preview"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                className="text-xs font-medium text-red-500 hover:text-red-600 px-2 py-1"
+              >
+                Remove
+              </button>
+            </div>
           )}
         </div>
       </div>
