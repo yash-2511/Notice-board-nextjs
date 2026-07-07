@@ -21,6 +21,11 @@ export default function Home({ notices, error }) {
   const [formLoading, setFormLoading] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
+  // Deletion States
+  const [deletingNoticeId, setDeletingNoticeId] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
+
   const handleFormSubmit = async (formData) => {
     setFormLoading(true);
     setSubmitError(null);
@@ -55,6 +60,30 @@ export default function Home({ notices, error }) {
     }
   };
 
+  const handleDeleteNotice = async () => {
+    if (!deletingNoticeId) return;
+    setDeleteLoading(true);
+    setDeleteError(null);
+    try {
+      const response = await fetch(`/api/notices?id=${deletingNoticeId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || "Failed to delete notice.");
+      }
+
+      // Success: close modal and refresh page data
+      setDeletingNoticeId(null);
+      router.replace(router.asPath);
+    } catch (err) {
+      setDeleteError(err.message);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   const handleOpenCreateForm = () => {
     setEditingNotice(null);
     setSubmitError(null);
@@ -70,6 +99,11 @@ export default function Home({ notices, error }) {
   const handleCloseForm = () => {
     setShowForm(false);
     setEditingNotice(null);
+  };
+
+  const handleOpenDeleteConfirm = (id) => {
+    setDeleteError(null);
+    setDeletingNoticeId(id);
   };
 
   return (
@@ -128,6 +162,49 @@ export default function Home({ notices, error }) {
         </div>
       )}
 
+      {/* Delete Confirmation Modal */}
+      {deletingNoticeId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/40 backdrop-blur-sm dark:bg-black/60">
+          <div className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xl p-6 animate-in fade-in zoom-in-95 duration-150">
+            <h3 className="text-lg font-bold text-zinc-950 dark:text-zinc-50">Delete Notice</h3>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-2">
+              Are you sure you want to delete this notice? This action is permanent and cannot be undone.
+            </p>
+
+            {deleteError && (
+              <div className="mt-4 p-3 rounded-lg bg-red-50 text-red-800 dark:bg-red-950/20 dark:text-red-400 border border-red-200 dark:border-red-900/50 text-xs font-medium">
+                {deleteError}
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800/80">
+              <button
+                type="button"
+                onClick={() => setDeletingNoticeId(null)}
+                disabled={deleteLoading}
+                className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteNotice}
+                disabled={deleteLoading}
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 inline-flex items-center gap-2"
+              >
+                {deleteLoading && (
+                  <svg className="animate-spin -ml-1 mr-1 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                )}
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Error State Banner */}
       {error && (
         <div className="mt-6 p-4 rounded-lg bg-red-50 text-red-800 dark:bg-red-950/20 dark:text-red-400 border border-red-200 dark:border-red-900/50">
@@ -154,7 +231,7 @@ export default function Home({ notices, error }) {
                   d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-.586-1.414l-4.5-4.5A2 2 0 0013.086 3H10"
                 />
               </svg>
-              <h3 className="text-base font-semibold text-zinc-950 dark:text-zinc-50">No notices found</h3>
+              <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">No notices found</h3>
               <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 max-w-xs mx-auto">
                 There are currently no announcements. Check back later for updates.
               </p>
@@ -206,8 +283,8 @@ export default function Home({ notices, error }) {
                         Edit
                       </button>
                       <button
-                        disabled
-                        className="text-xs font-medium text-red-500 opacity-50 cursor-not-allowed hover:text-red-600 px-2 py-1"
+                        onClick={() => handleOpenDeleteConfirm(notice.id)}
+                        className="text-xs font-medium text-red-650 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 px-2 py-1 transition-colors"
                       >
                         Delete
                       </button>
