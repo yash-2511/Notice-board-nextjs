@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useRouter } from "next/router";
 import { Geist, Geist_Mono } from "next/font/google";
 import prisma from "@/lib/prisma";
 import NoticeForm from "@/components/NoticeForm";
@@ -14,7 +15,42 @@ const geistMono = Geist_Mono({
 });
 
 export default function Home({ notices, error }) {
+  const router = useRouter();
   const [showForm, setShowForm] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
+
+  const handleCreateNotice = async (formData) => {
+    setFormLoading(true);
+    setSubmitError(null);
+    try {
+      const response = await fetch("/api/notices", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || "Failed to create notice.");
+      }
+
+      // Success: close form and refresh page data
+      setShowForm(false);
+      router.replace(router.asPath);
+    } catch (err) {
+      setSubmitError(err.message);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const handleOpenCreateForm = () => {
+    setSubmitError(null);
+    setShowForm(true);
+  };
 
   return (
     <div className={`${geistSans.variable} ${geistMono.variable} font-sans`}>
@@ -28,7 +64,7 @@ export default function Home({ notices, error }) {
         </div>
         <div>
           <button
-            onClick={() => setShowForm(true)}
+            onClick={handleOpenCreateForm}
             className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-zinc-100"
           >
             Add Notice
@@ -53,13 +89,17 @@ export default function Home({ notices, error }) {
               </button>
             </div>
             
+            {submitError && (
+              <div className="mb-4 p-3 rounded-lg bg-red-50 text-red-800 dark:bg-red-950/20 dark:text-red-400 border border-red-200 dark:border-red-900/50 text-xs font-medium">
+                {submitError}
+              </div>
+            )}
+
             <NoticeForm
               onCancel={() => setShowForm(false)}
-              onSubmit={(data) => {
-                console.log("Form submit logic skipped in Phase 5 foundation:", data);
-                setShowForm(false);
-              }}
+              onSubmit={handleCreateNotice}
               submitLabel="Create Notice"
+              isLoading={formLoading}
             />
           </div>
         </div>
